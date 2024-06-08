@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corona Virus Countries Data</title>
+    <link href="bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="custom.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            color: #4a4a4a;
+        }
+
+        .table {
+            background-color: #f5f5f5;
+        }
+
+        th,
+        td {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="text-center mb-4">Corona Virus Countries Data</h1>
+            <div class="card">
+                <div class="card-body">
+                    <select id="country-select" class="form-select mb-3">
+                        <option value="">Select a country</option>
+                    </select>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Total Cases</th>
+                            <th>New Cases</th>
+                            <th>Total Deaths</th>
+                            <th>New Deaths</th>
+                            <th>Total Recovered</th>
+                            <th>Active Cases</th>
+                        </tr>
+                        </thead>
+                        <tbody id="data-container"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="jquery.js"></script>
+<script src="popper.js"></script>
+<script src="bootstrap.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var countriesData = [];
+
+        $.get("https://api.collectapi.com/corona/countriesData", {
+            "authorization": "apikey 1Nz5zvHeyxhwLmArxkwx17:5AFTlzc7ZBKIrR9I4WZGbe"
+        }, function (data, status) {
+            if (status === "success") {
+                countriesData = data.result;
+                var select = $("#country-select");countriesData.forEach(function (countryData) {
+                    select.append($("<option></option>").attr("value", countryData.country).text(countryData.country));
+                });
+            } else {
+                console.error(data);
+            }
+        });
+
+        $("#country-select").change(function () {
+            var selectedCountry = $(this).val();
+            var dataContainer = $("#data-container");
+            dataContainer.empty();
+
+            if (selectedCountry) {
+                var countryData = countriesData.find(function (data) {
+                    return data.country === selectedCountry;
+                });
+
+                if (countryData) {
+                    var row = $("<tr></tr>");
+                    row.append($("<td></td>").text(countryData.totalCases));
+                    row.append($("<td></td>").text(countryData.newCases));
+                    row.append($("<td></td>").text(countryData.totalDeaths));
+                    row.append($("<td></td>").text(countryData.newDeaths));
+                    row.append($("<td></td>").text(countryData.totalRecovered));
+                    row.append($("<td></td>").text(countryData.activeCases));
+                    dataContainer.append(row);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
